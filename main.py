@@ -18,13 +18,22 @@ dp = Dispatcher()
 client = OpenAI()
 
 
-
 @dp.message(Command('start'))
 async def command_start_handler(message: Message) -> None:
     await message.answer(f"Gre loves, {html.bold(message.from_user.full_name)}!")
 
 
 @dp.message(Command('random'))
+async def command_random_handler(message: Message) -> None:
+    response = client.responses.create(
+        model="gpt-4o-mini-2024-07-18",
+        input=str(message),
+        instructions="дай любой рандомный факт"
+    )
+    await message.answer(f"{response.output_text}")
+
+
+@dp.message(Command('gpt'))
 async def command_random_handler(message: Message) -> None:
     response = client.responses.create(
         model="gpt-4o-mini-2024-07-18",
@@ -43,12 +52,9 @@ async def text_handler(message: Message) -> None:
     )
     await message.answer(f"{response.output_text}")
 
-#f"Gre still loves you, {html.bold(message.from_user.full_name)}!
-async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    # And the run events dispatching
+async def main() -> None:
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     await dp.start_polling(bot)
 
 
