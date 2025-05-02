@@ -1,4 +1,4 @@
-from aiogram import Dispatcher, Router, F
+from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, FSInputFile
 
@@ -13,21 +13,14 @@ async def command_start_handler(message: Message) -> None:
 
 @command_router.message(Command('random'))
 async def command_random_handler(message: Message) -> None:
-    answer = await(gpt_client.text_request('random') )
+    answer = await(gpt_client.command_request('random'))
     await message.answer(answer)
 
 
-
-# @dp.message(Command('gpt'))
-# async def command_random_handler(message: Message) -> None:
-#     await gpt_client.text_request('message')
-#
-#
-# @dp.message(F.text)
-# async def text_handler(message: Message) -> None:
-#     response = client.responses.create(
-#         model="gpt-4o-mini-2024-07-18",
-#         input=str(message),
-#         instructions="Разговаривай как молодой влюбленные поэт"
-#     )
-#     await message.answer(f"{response.output_text}")
+@command_router.message(F.text)
+async def text_handler(message: Message) -> None:
+    user_id = message.from_user.id
+    print(f"текст из телеги {message.text}")
+    answer = await(gpt_client.text_request(user_id = user_id, text = message.text))
+    print(f"ответ из чата гпт {answer}")
+    await message.answer(answer)
